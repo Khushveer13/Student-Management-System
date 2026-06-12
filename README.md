@@ -6,23 +6,6 @@ This application follows a clean layered architecture (Controller → Service �
 
 ---
 
-## 📷 Screenshots
-
-<p align="center">
-  <img src="screenshots/VK.png" alt="Dashboard" width="800">
-  <br><i>Dashboard Overview</i><br><br>
-  <img src="screenshots/VK1.png" alt="Students List" width="800">
-  <br><i>Students List & Search</i><br><br>
-  <img src="screenshots/VK2.png" alt="Add Student" width="800">
-  <br><i>Add Student Form</i><br><br>
-  <img src="screenshots/VK3.png" alt="Update Student" width="800">
-  <br><i>Update Student Form</i><br><br>
-  <img src="screenshots/vk5.png" alt="Delete Student" width="800">
-  <br><i>Delete / Validation Error Alerts</i><br>
-</p>
-
----
-
 ## 🚀 Key Features
 
 * **Dashboard Overview**: Metrics widgets showing total enrolled students, total courses, average student age, and dynamic course distribution charts.
