@@ -9,8 +9,6 @@ This application follows a clean layered architecture (Controller → Service �
 ## 📷 Screenshots
 
 <p align="center">
-  <img src="screenshots/dashboard.png" alt="Dashboard" width="800">
-  <br><i>Dashboard Overview (Chart.js integrations)</i><br><br>
   <img src="screenshots/students_list.png" alt="Students List" width="800">
   <br><i>Students List with Paginated Search & Column Sorting</i><br><br>
   <img src="screenshots/add_student.png" alt="Register Student" width="800">
