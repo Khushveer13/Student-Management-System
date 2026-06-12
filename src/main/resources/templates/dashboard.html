@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::mainContent})}">
+<body>
+    <div th:fragment="mainContent">
+        <!-- Top Metrics Cards -->
+        <div class="row g-4 mb-4">
+            <!-- Total Students Card -->
+            <div class="col-12 col-md-4">
+                <div class="custom-card widget-card widget-primary">
+                    <div>
+                        <div class="widget-value" th:text="${totalStudents != null ? totalStudents : 0}">0</div>
+                        <div class="widget-label">Total Enrolled Students</div>
+                    </div>
+                    <div class="widget-icon">
+                        <i class="bi bi-people-fill"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Unique Courses Card -->
+            <div class="col-12 col-md-4">
+                <div class="custom-card widget-card widget-success">
+                    <div>
+                        <div class="widget-value" th:text="${totalCourses != null ? totalCourses : 0}">0</div>
+                        <div class="widget-label">Active Courses Offered</div>
+                    </div>
+                    <div class="widget-icon">
+                        <i class="bi bi-journal-bookmark-fill"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Average Age Card -->
+            <div class="col-12 col-md-4">
+                <div class="custom-card widget-card widget-danger">
+                    <div>
+                        <div class="widget-value" th:text="${#numbers.formatDecimal(averageAge != null ? averageAge : 0, 1, 1)}">0.0</div>
+                        <div class="widget-label">Average Student Age</div>
+                    </div>
+                    <div class="widget-icon">
+                        <i class="bi bi-calendar-event"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <!-- Chart widget -->
+            <div class="col-12 col-lg-7">
+                <div class="custom-card h-100">
+                    <div class="custom-card-header">
+                        <h6 class="custom-card-title">Course Distribution</h6>
+                        <i class="bi bi-bar-chart-line-fill text-muted"></i>
+                    </div>
+                    <div>
+                        <canvas id="courseChart" style="max-height: 280px;"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="col-12 col-lg-5">
+                <div class="custom-card h-100">
+                    <div class="custom-card-header">
+                        <h6 class="custom-card-title">Quick Actions</h6>
+                        <i class="bi bi-lightning-charge-fill text-muted"></i>
+                    </div>
+                    <div class="d-flex flex-column gap-3">
+                        <a th:href="@{/students/new}" class="btn btn-primary w-100 text-start d-flex justify-content-between align-items-center">
+                            <span><i class="bi bi-person-plus-fill me-2"></i> Register New Student</span>
+                            <i class="bi bi-arrow-right"></i>
+                        </a>
+                        <a th:href="@{/students}" class="btn btn-secondary w-100 text-start d-flex justify-content-between align-items-center">
+                            <span><i class="bi bi-card-list me-2"></i> View Students Database</span>
+                            <i class="bi bi-arrow-right"></i>
+                        </a>
+                        <div class="p-3 bg-light rounded-3 border border-light-subtle">
+                            <div class="small fw-semibold text-secondary mb-1">System Version</div>
+                            <div class="small text-muted">EduSphere v1.0.0 (Production Ready)</div>
+                            <div class="small text-muted mt-2">Connected Database: <strong class="text-success">PostgreSQL (Port 2178)</strong></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Students Table -->
+            <div class="col-12">
+                <div class="custom-card">
+                    <div class="custom-card-header">
+                        <h6 class="custom-card-title">Recently Enrolled Students</h6>
+                        <a th:href="@{/students}" class="btn btn-sm btn-link text-decoration-none p-0 fw-medium">View All</a>
+                    </div>
+                    <div class="custom-table-container">
+                        <table class="custom-table">
+                            <thead>
+                                <tr>
+                                    <th>Enrollment No</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Course</th>
+                                    <th>Birth Date</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="student : ${recentStudents}">
+                                    <td>
+                                        <span class="custom-badge badge-primary" th:text="${student.enrollmentNo}">ENR-001</span>
+                                    </td>
+                                    <td>
+                                        <strong th:text="${student.name}">John Doe</strong>
+                                    </td>
+                                    <td th:text="${student.email}">john.doe@example.com</td>
+                                    <td>
+                                        <span class="custom-badge badge-success" th:text="${student.course}">Computer Science</span>
+                                    </td>
+                                    <td th:text="${#temporals.format(student.birthDate, 'MMM dd, yyyy')}">Jan 01, 2000</td>
+                                    <td>
+                                        <a th:href="@{/students/edit/{id}(id=${student.id})}" class="btn btn-sm btn-outline-primary py-1 px-2" title="Edit">
+                                            <i class="bi bi-pencil-fill"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr th:if="${#lists.isEmpty(recentStudents)}">
+                                    <td colspan="6" class="text-center text-muted py-4">No student data available. Click "Register New Student" to get started!</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chart JS integration -->
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            document.addEventListener("DOMContentLoaded", function() {
+                var chartData = [[${courseDistribution}]];
+                
+                if (!chartData || Object.keys(chartData).length === 0) {
+                    chartData = {"No Students": 0};
+                }
+
+                var labels = Object.keys(chartData);
+                var data = Object.values(chartData);
+
+                var ctx = document.getElementById('courseChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            data: data,
+                            backgroundColor: [
+                                '#6366f1', // Indigo
+                                '#10b981', // Emerald
+                                '#f59e0b', // Amber
+                                '#ef4444', // Rose
+                                '#8b5cf6', // Violet
+                                '#3b82f6'  // Blue
+                            ],
+                            borderWidth: 2,
+                            borderColor: '#ffffff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'right',
+                                labels: {
+                                    font: {
+                                        family: "'Outfit', sans-serif",
+                                        size: 12
+                                    },
+                                    usePointStyle: true,
+                                    pointStyle: 'circle'
+                                }
+                            }
+                        },
+                        cutout: '65%'
+                    }
+                });
+            });
+            /*]]>*/
+        </script>
+    </div>
+</body>
+</html>
